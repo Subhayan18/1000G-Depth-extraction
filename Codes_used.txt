@@ -1,0 +1,76 @@
+#All 1000G files can be acquired from here: http://ftp.1000genomes.ebi.ac.uk/vol1/
+
+wget http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/current.tree;	#GIVES THE LIST OF ALL FILES AVAILABLE IN 1000G RELEASE 3#
+grep -hnr '.bam' current.tree > All_BAMfiles.list;		#ONLY KEEP THE LINES THAT HAS .bam#
+sed -i '/.bam.bai/d' All_BAMfiles.list;				#REMOVE THE .bam.bai FILES#
+sed -i '/.bam.bas/d' All_BAMfiles.list;				#REMOVE THE .bam.bas FILES#
+sed -i '/cram/d' All_BAMfiles.list;				#REMOVE THE .cram FILES#
+sed -i '/chrom/d' All_BAMfiles.list;				#REMOVE THE Chromosome specific  FILES#
+sed -i '/exome/d' All_BAMfiles.list;				#REMOVE THE exome sequencing FILES#
+sed -i '/unmapped/d' All_BAMfiles.list;				#REMOVE THE UNMAPPED FILES#
+sed -i '/csra/d' All_BAMfiles.list;				#REMOVE THE .csra FILES#
+sed -i '/technical/d' All_BAMfiles.list;			#REMOVE THE 'technical' FILES#
+awk '/CEU/' All_BAMfiles.list > test;				#KEEP ONLY CENTRAL EUROPEAN ANCESTRY SPECIFIC FILES#
+awk '!_[$1]++' test > All_BAMfiles.list;			#REMOVE ALL DUPLICATES#
+awk '/bwa/' All_BAMfiles.list > test && mv test All_BAMfiles.list;	#KEEP ONLY 'bwa' string matched files#
+sed -i '/evidence/d' All_BAMfiles.list;				#REMOVE ALL EVIDENCE SPECIFIC OR SUPPORT FILES#
+grep '.bam' All_BAMfiles.list | cut -f 1 | sed 's/.*://g' > test && mv test All_BAMfiles.list;	 #KEEP ONLY THE FTP LINK OF THE SELECTED BAM FILES#
+
+#TO GET COVERAGE (around chrmosome 1, base pair 40000 to 50000) FROM ALL THESE SAMPLE BAM FILES#
+
+cat All_BAMfiles.list | while read line; do samtools depth -r 1:40000-50000 "http://ftp.1000genomes.ebi.ac.uk/vol1/$line" && rm -f *.bam.bai; done &> Chr01_4000_to_5000.txt
+
+#THIS WILL SAVE THE RESULTS IN THE FILE NAMED Chr01_4000_to_5000.txt#
+
+#The options used for samtools execution can be found here: http://www.htslib.org/doc/samtools.html
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------
+#NOT RUN#
+#The example I created can be generated like this:
+#The example_BAMfiles.list only includes three individuals, hence it suns faster. The actual result will include 183 individuals.
+#cat Example_BAMfiles.list | while read line; do samtools depth -r 1:40000-40005 "http://ftp.1000genomes.ebi.ac.uk/vol1/$line" && rm -f *.bam.bai; done &> Example_output_Chr01_40000_to_40005.txt
+
+#---------------------------------------------------------METOD-2-------------------------------------------------------------------------------
+#WHAT TO DO#
+#CREATE ANE FILE WITH 'TAB' DELIMITION THAT INCLUDES ALL THE SNPS IN THE FOLLOWING STRUCTURE:#
+#1	123456	 123456# #SNP IN CHROMOSOME 1 WITH BASEPAIR POSITION 123456#
+#8	234567	 234567# #SNP IN CHROMOSOME 8 WITH BASEPAIR POSITION 234567#
+#FOR AN EXAMPLE SEE: Sample_SNPfile.bed#
+#REMEMBER!! THE EXTENSION OF THE SNP FILE NEEDS TO BE '.bed'#
+
+#THEN RUN THE FOLLOWING:#
+
+cat All_BAMfiles.list | while read line; do samtools depth -b MY_SNP_FILE.bed "http://ftp.1000genomes.ebi.ac.uk/vol1/$line" && rm -f *.bam.bai; done &> OUTPUT_I_WANT.txt;
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------
+#NOT RUN#
+#The example I created can be generated like this:
+#The example_BAMfiles.list only includes three individuals, hence it suns faster. The actual result will include 183 individuals.
+#The example SNP file only includes two SNPs for demonstration.
+#THE ACTUAL PROGRAM WILL RUN FOR A REALLY LONG TIME#
+#cat Example_BAMfiles.list | while read line; do samtools depth -b Sample_SNPfile.bed "http://ftp.1000genomes.ebi.ac.uk/vol1/$line" && rm -f *.bam.bai; done &> Example_output.txt;
+
+#---------------------------------------------------------------METHOD-3-------------------------------------------------------------------------
+#SCRATCH THAT, I HAVE FOUND MORE EFFICIENT WAY TO DO THIS#
+#CREATE A FILE WITH DESCRIPTION OF ALL SNPs IN THE FOLLOWING STRUCTURE:#
+#1#	#SNP IN CHROMOSOME 1 WITH BASEPAIR POSITION 40000#
+#40000#
+#2#	#SNP IN CHROMOSOME 2 WITH BASEPAIR POSITION 50000#
+#50000#
+#FOR AN EXAMPLE SEE: Sample_SNPfile_r.txt#
+#REMEMBER!! TO KEEP JUST ONE EMPTY LINE AT THE END OF THE FILE#
+
+#CHANGE THE FILENAMES TO INCLUDE ALL SNPs AND ALL SAMPLES IN THE SCRIPT FILE: 'Extract_Depth_All_SNP.sh'#
+#THEN RUN THE FOLLOWING:#
+
+./Extract_Depth_All_SNP.sh
+
+#THIS WILL CREATE N NUMBER OF FILES. N IS NUMBER OF TOTAL SNPS. EACH FILE WILL INCLUDE DEPTH CALCULATED FOR EACH INDIVIDUAL IN 1000G IN EACH LINE#
+
+#-----------------------------------------------------------------------------------------------------------------------------------------------
+#NOT RUN#
+#The example I created can be generated like this:
+#The example_BAMfiles.list only includes three individuals, hence it suns faster. The actual result will include 183 individuals.
+#The example SNP file only includes two SNPs for demonstration.
+#THE ACTUAL PROGRAM WILL RUN FOR A REALLY LONG TIME#
+#./Extract_Depth_All_SNP.sh #OFCOURSE RUN THIS BEFORE CHANGING ANYTHING INSIDE THE FILE#

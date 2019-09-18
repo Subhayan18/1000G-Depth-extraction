@@ -1,0 +1,21 @@
+[M::test_and_fetch] downloading file 'http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/NA12058/alignment/NA12058.mapped.ILLUMINA.bwa.CEU.low_coverage.20120522.bam.bai' to local directory
+1	400000	1
+1	400001	1
+1	400002	1
+1	400003	1
+1	400004	1
+1	400005	1
+[M::test_and_fetch] downloading file 'http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/NA12272/alignment/NA12272.mapped.ILLUMINA.bwa.CEU.low_coverage.20120522.bam.bai' to local directory
+1	400000	5
+1	400001	5
+1	400002	5
+1	400003	5
+1	400004	5
+1	400005	5
+[M::test_and_fetch] downloading file 'http://ftp.1000genomes.ebi.ac.uk/vol1/ftp/phase3/data/NA12340/alignment/NA12340.mapped.ILLUMINA.bwa.CEU.low_coverage.20120522.bam.bai' to local directory
+1	400000	8
+1	400001	8
+1	400002	8
+1	400003	8
+1	400004	8
+1	400005	8
